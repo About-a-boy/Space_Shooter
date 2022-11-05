@@ -4,9 +4,9 @@
 #include<windows.h>
 #include<time.h>
 
-#define SCREEN_WIDTH 90
-#define SCREEN_HEIGHT 26
-#define WIN_WIDTH 70
+#define SCREEN_WIDTH 118
+#define SCREEN_HEIGHT 28
+#define WIN_WIDTH 80
 #define MENU_WIDTH 20
 #define GAP_SIZE 7
 #define Enemy_DIF 45
@@ -48,13 +48,11 @@ void drawBorder(){
         cout<<"±";
     }
     for(int  i=0;i<SCREEN_HEIGHT;i++){
-        gotoxy(0,i);
-        cout<<"±";
-        gotoxy(SCREEN_WIDTH,i);
-        cout<<"±";
+        gotoxy(0,i);cout<<"±";
+        gotoxy(SCREEN_WIDTH,i);cout<<"±";
     }
     for(int i=0;i<SCREEN_HEIGHT;i++){
-    	gotoxy(WIN_WIDTH,i);cout<<"�";
+    	gotoxy(WIN_WIDTH,i);cout<<"±";
 	}
 }
 void genEnemy(int ind){
@@ -85,7 +83,7 @@ void genBullet(){
 	bullets[bIndex][0]=22;
 	bullets[bIndex][1]=birdPos;
 	bullets[bIndex][2]=22;
-	bullets[bIndex][0]=birdPos+4;
+	bullets[bIndex][3]=birdPos+4;
 	bIndex++;
 	if(bIndex==20)
 		bIndex=0;	
@@ -95,7 +93,8 @@ void moveBullet(){
 		if(bullets[i][0]>2)
 		   bullets[i][0]--;
 		else
-			bullets[i][2]=0;
+			bullets[i][0]=0;
+		
 		if(bullets[i][2]>2)
 			bullets[i][2]--;
 		else
@@ -104,15 +103,15 @@ void moveBullet(){
 }
 void drawBullets(){
 	for(int i=0;i<20;i++){
-		if(bullets[i][0]>=1){
+		if(bullets[i][0]>1){
 			gotoxy(bullets[i][1],bullets[i][0]);cout<<".";
 			gotoxy(bullets[i][3],bullets[i][2]);cout<<".";
 		}
 	}
 }
 void eraseBullet(int i){
-	gotoxy(bullets[i][1],bullets[i][0]);cout<<".";
-	gotoxy(bullets[i][3],bullets[i][3]);cout<<".";
+	gotoxy(bullets[i][1],bullets[i][0]);cout<<" ";
+	gotoxy(bullets[i][3],bullets[i][3]);cout<<" ";
 }
 void eraseBullets(){
 	for(int i=0;i<20;i++){
@@ -125,7 +124,7 @@ void eraseBullets(){
 void drawbird(){
 	for(int i=0;i<3;i++){
 		for(int j=0;j<5;j++){
-			gotoxy(j+birdPos,i+22);cout<<" ";
+			gotoxy(j+birdPos,i+22);cout<<bird[i][j];
 		}
 	}
 }
@@ -138,7 +137,7 @@ void eraseBird(){
 }
 int collision(){
 	if(enemyY[0]+4>=23){
-		if(enemyX[0]+4-birdPos>=0&&enemyX[0]+4-birdPos<8){
+		if(enemyX[0] + 4 - birdPos >= 0 && enemyX[0] + 4 - birdPos < 8){
 			return 1;
 		}
 	}
@@ -149,7 +148,7 @@ int bulletHit(){
 		for(int j=0;j<4;j+=2){
 			if(bullets[i][j]!=0){
 				if(bullets[i][j]>=enemyY[0]&&bullets[i][j]<=enemyY[0]+4){
-					if(bullets[i][j+1]>=enemyX[0]&&bullets[i][j+1]<=enemyX[0]+4){
+					if(bullets[i][j+1]>=enemyX[0] && bullets[i][j+1]<=enemyX[0]+4){
 						eraseBullet(i);
 						bullets[i][j]=0;
 						resetEnemy(0);
@@ -179,17 +178,19 @@ void gameover(){
 	getch();
 }
 void updateScore(){
-	gotoxy(WIN_WIDTH+7,5);cout<<"Score: "<<score<<endl;
+	gotoxy(WIN_WIDTH+17,5);cout<<"Score: "<<score<<endl;
 }
 void instructions(){
 	system("cls");
 	cout<<"Instrucciones";
-	cout<<"\n--------------------";
+	cout<<"\n-----------------------------------------";
 	cout<<"\n Presiona la barra de espacio para volar";
 	cout<<"\n Presiona cualquier tecla para volver al menu"<<endl;
 	getch();
 }
 void play(){
+		char can[]="C:/Cancion.mp3";
+	cout<<PlaySound((LPCSTR)can,NULL,SND_FILENAME|SND_ASYNC);
 	birdPos = -1+WIN_WIDTH/2;
 	score=0;
 	enemyFlag[0]=1;
@@ -203,14 +204,16 @@ void play(){
 	genEnemy(0);
 	genEnemy(1);
 	updateScore();
-	gotoxy(WIN_WIDTH+5,2);cout<<"Space Shooter";
-	gotoxy(WIN_WIDTH+6,4);cout<<"-------------";
-	gotoxy(WIN_WIDTH+6,6);cout<<"-------------";
-	gotoxy(WIN_WIDTH+7,12);cout<<" Controles  ";
-	gotoxy(WIN_WIDTH+7,13);cout<<"------------";
-	gotoxy(WIN_WIDTH+2,14);cout<<"'A' Moverse a la izquierda";
-	gotoxy(WIN_WIDTH+2,15);cout<<"'D' Moverse a la derecha";
-	gotoxy(WIN_WIDTH+2,16);cout<<"Barra de espacio -> Disparar";
+	
+	gotoxy(WIN_WIDTH+14,2);cout<<"Space Shooter";
+	gotoxy(WIN_WIDTH+14,4);cout<<"-------------";
+	gotoxy(WIN_WIDTH+14,6);cout<<"-------------";
+	gotoxy(WIN_WIDTH+15,9);cout<<" Controles  ";
+	gotoxy(WIN_WIDTH+14,10);cout<<"-------------";
+	gotoxy(WIN_WIDTH+7,13);cout<<"'A' Moverse a la izquierda";
+	gotoxy(WIN_WIDTH+8,15);cout<<"'D' Moverse a la derecha";
+	gotoxy(WIN_WIDTH+7,17);cout<<"Barra de espacio -> Disparar";
+	
 	gotoxy(10,5);cout<<"Presiona cualquier tecla para iniciar";
 	getch();
 	gotoxy(10,5);cout<<"                                     ";
@@ -235,8 +238,8 @@ void play(){
 				break;
 			}
 		}
+		
 		drawbird();
-		eraseBird();
 		drawEnemy(0);
 		drawEnemy(1);
 		drawBullets();
@@ -248,16 +251,19 @@ void play(){
 			score++;
 			updateScore();
 		}
-		Sleep(200);
+		Sleep(100);
 		eraseBird();
 		eraseEnemy(0);
 		eraseEnemy(1);
 		eraseBullets();
 		moveBullet();
-		if(enemyFlag[0]==1)
-			enemyY[0]+=1;
-		if(enemyFlag[1]==1)
+		
+		if(enemyFlag[0]==1){
+			enemyY[0]+=1;	
+		}
+		if(enemyFlag[1]==1){
 			enemyY[1]+=1;
+		}
 		if(enemyY[0]>SCREEN_HEIGHT-5){
 			resetEnemy(0);
 		}
@@ -266,25 +272,30 @@ void play(){
 		}
 	}
 }
-main(){
+int main(){
+	system("color 40");
 	setcursor(0,0);
+	
 	srand((unsigned)time(NULL));
 	do{
 		system("cls");
-		gotoxy(10,5);cout<<"---------------------";
-		gotoxy(10,6);cout<<"    Space Shooter    ";
-		gotoxy(10,7);cout<<"---------------------";
-		gotoxy(10,9); cout<<"1. Iniciar juego";
-		gotoxy(10,10);cout<<"2. Instrucciones";
-		gotoxy(10,11);cout<<"3. Quitar";
-		gotoxy(10,13);cout<<"Seleccione una opcion";
+		gotoxy(10,9.5); cout<<"\t\t\t\t\t---------------------";
+		gotoxy(10,10); cout<<"\t\t\t\t\t|   Space Shooter   |";
+		gotoxy(10,11); cout<<"\t\t\t\t\t---------------------";
+		gotoxy(10,13); cout<<"\t\t\t\t\t1. Iniciar juego";
+		gotoxy(10,14);cout<<"\t\t\t\t\t2. Instrucciones";
+		gotoxy(10,15);cout<<"\t\t\t\t\t3. Quitar";
+		gotoxy(10,16);cout<<"\t\t\t\t\tSeleccione una opcion\n";
 		char op=getche();
-		if(op=='1')
-			play();
-		else if(op=='2')
+		if(op=='1'){
+			play();	
+		}
+		else if(op=='2'){
 			instructions();
-		else if(op=='3')
-			exit(0);
+		}
+		else if(op=='3'){
+			exit(0);	
+		}
 	}while(1);
 	return 0;
 }
